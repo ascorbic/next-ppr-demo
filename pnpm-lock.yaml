@@ -8,6 +8,9 @@ dependencies:
   '@heroicons/react':
     specifier: 2.1.1
     version: 2.1.1(react@18.2.0)
+  '@netlify/plugin-nextjs':
+    specifier: 5.1.2
+    version: 5.1.2
   clsx:
     specifier: 2.1.0
     version: 2.1.0
@@ -218,6 +221,11 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
+
+  /@netlify/plugin-nextjs@5.1.2:
+    resolution: {integrity: sha512-rftBlZmrkxy8zeXZ/tT2u/v2iIZd9s0cV7MdtjUFOgizjhtY0fCZEUQ7OIEQIMogzGNMDXFcb84HXX9a8OZ8/w==}
+    engines: {node: '>=18.0.0'}
+    dev: false
 
   /@next/env@14.0.5-canary.42:
     resolution: {integrity: sha512-omWU5PXVfbUbIRsalLl2iIOJ094Y87EyFsVJ2xJU2dkSodb9nFBZxHe+Zr2noGvFcWtjLOQ4/oEjowd3Gl7ZnQ==}
