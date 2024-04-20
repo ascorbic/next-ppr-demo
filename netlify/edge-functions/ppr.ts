@@ -8,7 +8,6 @@ const pathToBlobKey = (path: string) =>
 export default async function handler(request: Request, context: Context) {
   const timing = [];
   const start = Date.now();
-  let now = start;
   const url = new URL(request.url);
   console.log('Starting request for', url.pathname);
   const deployStore = getDeployStore();
@@ -18,7 +17,6 @@ export default async function handler(request: Request, context: Context) {
   });
   console.timeEnd('get');
   timing.push(`blob;dur=${Date.now() - start};desc="get blob"`);
-  now = Date.now();
   if (data?.value?.kind !== 'PAGE') {
     console.log('No prerendered HTML found for', url.pathname, data);
     return;
@@ -41,7 +39,6 @@ export default async function handler(request: Request, context: Context) {
 
   const combinedStream = new ReadableStream<Uint8Array>({
     async start(controller) {
-      const startStream = Date.now();
       const postponedResponse = fetch(postponedURL, {
         method: 'POST',
         body: postponed,
@@ -55,7 +52,7 @@ export default async function handler(request: Request, context: Context) {
         if (done) break;
         controller.enqueue(value);
       }
-      const shellTiming = `shell;dur=${Date.now() - startStream};desc="shell"`;
+      const shellTiming = `shell;dur=${Date.now() - start};desc="shell"`;
       // Now, handle the postponed body stream
       const postponedResult = await postponedResponse;
       const postponedReader = postponedResult.body!.getReader();
