@@ -6,7 +6,9 @@ const pathToBlobKey = (path: string) =>
   encodeBase64(path === '/' ? '/index' : path);
 
 export default async function handler(request: Request, context: Context) {
-  const now = Date.now();
+  const timing = [];
+  const start = Date.now();
+  let now = start;
   const url = new URL(request.url);
   console.log('Starting request for', url.pathname);
   const deployStore = getDeployStore();
@@ -15,7 +17,8 @@ export default async function handler(request: Request, context: Context) {
     type: 'json',
   });
   console.timeEnd('get');
-
+  timing.push(`blob;dur=${Date.now() - start};desc="get blob"`);
+  now = Date.now();
   if (data?.value?.kind !== 'PAGE') {
     console.log('No prerendered HTML found for', url.pathname, data);
     return;
@@ -38,6 +41,7 @@ export default async function handler(request: Request, context: Context) {
 
   const combinedStream = new ReadableStream<Uint8Array>({
     async start(controller) {
+      const startStream = Date.now();
       const postponedResponse = fetch(postponedURL, {
         method: 'POST',
         body: postponed,
@@ -51,13 +55,15 @@ export default async function handler(request: Request, context: Context) {
         if (done) break;
         controller.enqueue(value);
       }
-
+      const shellTiming = `shell;dur=${Date.now() - startStream};desc="shell"`;
       // Now, handle the postponed body stream
       const postponedResult = await postponedResponse;
       const postponedReader = postponedResult.body!.getReader();
       controller.enqueue(
         new TextEncoder().encode(
-          `\n<!-- POSTPONED INCOMING!! ${Date.now() - now}ms -->\n`,
+          `\n<!-- POSTPONED INCOMING!! ${
+            Date.now() - start
+          }ms. ${shellTiming} -->\n`,
         ),
       );
       while (true) {
@@ -74,14 +80,17 @@ export default async function handler(request: Request, context: Context) {
     'Returning response for',
     url.pathname,
     ' after ',
-    Date.now() - now,
+    Date.now() - start,
     'ms',
   );
+  timing.push(`total;dur=${Date.now() - start};desc="total"`);
+
   return new Response(combinedStream, {
     headers: {
       ...headers,
       'Content-Type': 'text/html',
       'Cache-Control': 'public, max-age=0, must-revalidate',
+      'Server-Timing': timing.join(', '),
     },
   });
 }
