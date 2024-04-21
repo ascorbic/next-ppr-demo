@@ -9,7 +9,11 @@ export default async function handler(request: Request) {
   // This is the prerendered HTML content
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
-      controller.enqueue(new TextEncoder().encode(staticHTML));
+      controller.enqueue(
+        new TextEncoder().encode(
+          staticHTML + `<!-- ${Date.now() - start}ms -->`,
+        ),
+      );
       controller.close();
     },
   });
@@ -17,13 +21,18 @@ export default async function handler(request: Request) {
   const direct = url.searchParams.get('direct');
 
   if (direct) {
-    return new Response(direct === 'stream' ? stream : staticHTML, {
-      headers: {
-        'x-direct-type': direct,
-        'Content-Type': 'text/html',
-        'Cache-Control': 'public, max-age=0, must-revalidate',
+    return new Response(
+      direct === 'stream'
+        ? stream
+        : staticHTML + `<!-- ${Date.now() - start}ms -->`,
+      {
+        headers: {
+          'x-direct-type': direct,
+          'Content-Type': 'text/html',
+          'Cache-Control': 'public, max-age=0, must-revalidate',
+        },
       },
-    });
+    );
   }
 
   const postponedURL = new URL(`/_next/postponed/resume${url.pathname}`, url);
@@ -40,7 +49,9 @@ export default async function handler(request: Request) {
         if (done) break;
         controller.enqueue(value);
       }
-      const shellTiming = `shell;dur=${Date.now() - start};desc="shell"`;
+      const shellTiming = `<!-- shell;dur=${
+        Date.now() - start
+      };desc="shell" -->`;
       controller.enqueue(new TextEncoder().encode(shellTiming));
       controller.close();
     },
