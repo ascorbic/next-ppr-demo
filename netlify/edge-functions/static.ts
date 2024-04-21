@@ -14,9 +14,12 @@ export default async function handler(request: Request) {
     },
   });
 
-  if (url.searchParams.has('direct')) {
-    return new Response(stream, {
+  const direct = url.searchParams.get('direct');
+
+  if (direct) {
+    return new Response(direct === 'stream' ? stream : staticHTML, {
       headers: {
+        'x-direct-type': direct,
         'Content-Type': 'text/html',
         'Cache-Control': 'public, max-age=0, must-revalidate',
       },
