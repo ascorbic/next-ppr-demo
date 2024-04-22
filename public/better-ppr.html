@@ -570,7 +570,9 @@
     </script>
     <script type="module">
       const url = new URL(window.location.href);
-      url.pathname = `/_next/postponed/resume${url.pathname}`;
+      //   Normally done like this, but now hard-coded
+      //   url.pathname = `/_next/postponed/resume${url.pathname}`;
+      url.pathname = `/_next/postponed/resume`;
       const pprData = document.getElementById('_ppr-data').textContent;
       const response = fetch(url.href, {
         method: 'POST',
