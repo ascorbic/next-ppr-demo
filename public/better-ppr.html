@@ -570,27 +570,27 @@
     </script>
     <script type="module">
       const url = new URL(window.location.href);
-      url.pathname = `/_next/postponed/resume${url.pathname}`
+      url.pathname = `/_next/postponed/resume${url.pathname}`;
       const pprData = document.getElementById('_ppr-data').textContent;
       const response = fetch(url.href, {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'x-matched-path': url.pathname,
-          },
-          body: pprData,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-matched-path': url.pathname,
+        },
+        body: pprData,
       });
-      document.on("DOMContentLoaded", () => {
-          response.then(({ body }) => {
-              const reader = body.getReader();
-              const decoder = new TextDecoder();
-              let buffer = '';
-              reader.read().then(function processText({ done, value }) {
-                  document.body.innerHTML += decoder.decode(value, { stream: true });
-                  return reader.read().then(processText);
-              });
+      document.on('DOMContentLoaded', () => {
+        response.then(({ body }) => {
+          const reader = body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+          reader.read().then(function processText({ done, value }) {
+            document.body.innerHTML += decoder.decode(value, { stream: true });
+            return reader.read().then(processText);
           });
-      }
+        });
+      });
     </script>
   </head>
 
