@@ -1,4 +1,5 @@
 import type { Config, Context } from '@netlify/functions';
+import etag from 'etag';
 import { getDeployStore } from '@netlify/blobs';
 
 const pathToBlobKey = (path: string) =>
@@ -32,17 +33,16 @@ export default async function handler(request: Request, context: Context) {
     headers: {
       ...headers,
       'Content-Type': 'text/html',
-      'Cache-Control': 's-maxage=3600, stale-while-revalidate=36000',
+      'Netlify-CDN-Cache-Control': 'public, s-maxage=31536000, must-revalidate',
       'Server-Timing': timing.join(', '),
+      ETag: etag(html),
     },
   });
 }
 
 const script = /* js */ `
     const url = new URL(window.location.href);
-    //   Normally done like this, but now hard-coded
-    //   url.pathname = \`/_next/postponed/resume\$\{url.pathname\}\`;
-    url.pathname = "/_next/postponed/resume";
+    url.pathname = \`/_next/postponed/resume\${url.pathname.replace('/_better-ppr', '')}\`;
     const pprData = document.getElementById('_ppr-data').textContent;
     const response = fetch(url.href, {
       method: 'POST',
