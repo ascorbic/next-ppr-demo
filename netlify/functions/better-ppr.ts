@@ -58,13 +58,14 @@ const script = /* js */ `
         console.log('loaded')
         const reader = body.getReader();
         const decoder = new TextDecoder();
-        let buffer = '<script>console.log("hi")</script>';
+        let buffer = '<scr' + 'ipt>console.log("hi")</scr' + 'ipt>';
         reader.read().then(function processText({ done, value }) {
           if (done) {
             return;
           }
           const data = decoder.decode(value, { stream: true });
-          if (data.endsWith('</script>') || data.endsWith('</html>')) {
+          //  Yes, in the year of our lord 2024, this is still needed
+          if (data.endsWith('</scr' + 'ipt>') || data.endsWith('</ht'+ 'ml>')) {
             console.log('flushing')
             const range = document.createRange();
             const fragment = range.createContextualFragment(buffer + data);
