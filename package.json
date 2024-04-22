@@ -21,6 +21,7 @@
     "@heroicons/react": "2.1.1",
     "@netlify/blobs": "7.3.0",
     "@netlify/edge-functions": "2.5.1",
+    "@netlify/functions": "2.6.0",
     "@netlify/plugin-nextjs": "5.1.2",
     "clsx": "2.1.0",
     "date-fns": "3.1.0",
